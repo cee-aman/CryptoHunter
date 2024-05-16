@@ -12,6 +12,7 @@ import {
   InputBase,
   LinearProgress,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
   TableHead,
@@ -21,82 +22,77 @@ import {
   Typography,
   alpha,
   createTheme,
+  makeStyles,
   styled,
 } from "@material-ui/core";
 import tableData from "./tableData.json";
+import { Link } from "react-router-dom";
+import { Pagination, Tab, TextField } from "@mui/material";
 
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  marginTop: 30,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(3),
-    width: "auto",
-  },
-}));
 
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-    },
+const useStyles = makeStyles(() => ({
+row : {
+  backgroundColor : "#16171a",
+  cursor : "pointer",
+  "&:hover" : {
+    backgroundColor : "#131111"
+  }, 
+  fontFamily : "Montserrat"
+},
+pageina : {
+  "& .MuiPaginationItem-root" : {
+    color : "gold"
   },
-}));
+}
+}))
 
 function CoinsTable() {
   const [CoinData, setCoinData] = useState([]);
   const [loading, setloading] = useState(false);
   const [search, setsearch] = useState('')
+  const [page, setpage] = useState(1)
+  const { currency, symbol } = useContext(crypto);
 
-  const { currency } = useContext(crypto);
-
-//   const fetchCoins = async () => {
-//     setloading(true);
-//     const response = await axios.get(CoinList(currency));
-//     setCoinData(response.data);
-//     setloading(false);
-//   };
-
-//   useEffect(() => {
-//     fetchCoins();
-//   }, [currency]);
-
-
+  const classes = useStyles()
   const fetchCoins = async () => {
     setloading(true);
-    setCoinData(tableData);
+    const response = await axios.get(CoinList(currency));
+    setCoinData(response.data);
     setloading(false);
   };
 
   useEffect(() => {
     fetchCoins();
-  }, []);
+  }, [currency]);
 
 
-  console.log(loading);
+  // const fetchCoins = async () => {
+  //   setloading(true);
+  //   setCoinData(tableData);
+  //   setloading(false);
+  // };
+
+  // useEffect(() => {
+  //   fetchCoins();
+  // }, []);
+
+  const handleSearchBar = () => {
+    // Correctly convert names and symbols to lowercase
+    return CoinData.filter((coin) => {
+      return coin.name.toLowerCase().includes(search.toLowerCase()) || coin.symbol.toLowerCase().includes(search.toLowerCase());
+    });
+  };
+  
+  function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+useEffect(() => {
+  console.log(handleSearchBar());
+  console.log(search)
+
+}, [search])
 
   const darkTheme = createTheme({
     palette: {
@@ -106,6 +102,8 @@ function CoinsTable() {
       type: "dark",
     },
   });
+  const headers = ["Coin", "Price", "24h Change", "Market Cap"];
+
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -116,38 +114,58 @@ function CoinsTable() {
         >
           Crypto Prices by Market Cap
         </Typography>
-        <Search>
-          <SearchIconWrapper>
-            <SearchIcon />
-          </SearchIconWrapper>
-          <StyledInputBase
-            style={{ fontFamily: "Montserrat" }}
-            placeholder="Search…"
-            onChange={(event) => setsearch(event.target.value)} // Log the input value
-          />
-        </Search>
+        <TextField style={{marginTop: 15}} fullWidth label="Search" id="fullWidth" onChange={(e) => setsearch(e.target.value) } />
         <TableContainer>
         
         {
-            loading ? <LinearProgress style={{color : "gold", width : "80%"}} /> : (
+            loading ? <LinearProgress style={{color : "gold", width : "100%", marginTop: "10px"}} /> : (
 
                 <>
                 <Table style={{marginTop: 40}}>
                 <TableHead style={{backgroundColor : "#EEBC1D"}}>
                 <TableRow>
                 {
-                    ["Coin", "Price", "24h Change", "Market Cap"].map((table) =>(
-                        <TableCell key={table} style={{color : "black", fontWeight : 700, fontFamily : "montserrat"}} align={table === "Coin" ? '' : "right"  }>{table}</TableCell>
+                    headers.map((table) =>(
+                        <TableCell key={table} style={{color : "black", fontWeight : 700, fontFamily : "montserrat"}} >{table}</TableCell>
                     ) )
                 }
                 </TableRow>
                 
                 </TableHead>
+                <TableBody>
+                {handleSearchBar().slice((page -1) * 10, (page - 1 ) * 10 + 10)
+                  .map((row) => {
+                  const profit = row.price_change_percentage_24h > 0;
+                  return (
+                    <TableRow key={row.id}>
+                      <TableCell component="th" scope="row" style={{ display: "flex", gap: 15 }}>
+                        <Link to={`/coins/${row.id}`}>
+                          <img src={row.image} alt={row.name} height="50" style={{ marginBottom: 10 }} />
+                          <div style={{ display: "flex", flexDirection: "column" }}>
+                            <span style={{ textTransform: "uppercase", fontSize: 22 }}>{row.symbol}</span>
+                            <span style={{ color: "darkgray" }}>{row.name}</span>
+                          </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell >{symbol}{numberWithCommas(row.current_price.toFixed(2))}</TableCell>
+                      <TableCell ><span style={{color : profit > 0 ? "rgb(14, 203 ,129)" : "red", fontWeight : 500}}>{profit? "+" : "-"}{numberWithCommas(row.price_change_percentage_24h.toFixed(2))}%</span> </TableCell>
+                      <TableCell>{numberWithCommas(row.market_cap)}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
                 </Table>
                 </>
             ) 
         }
         </TableContainer>
+              <Pagination  style={{padding: 20, display : 'flex', justifyContent : 'center', width : '100%'}} count={(handleSearchBar()?.length/10).toFixed(0)} variant="outlined" color="secondary"
+              onChange={(_, value) => { setpage(value)
+                window.scroll(0, 450)
+
+              }}
+               />
+
        
       </Container>
     </ThemeProvider>

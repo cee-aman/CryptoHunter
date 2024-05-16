@@ -58,7 +58,7 @@ useEffect(() => {
 // useEffect(() => {
 //  getCoinData()
 // }, [])
-
+console.log(treding)
 
 const items = treding.map((coin) => {
 let profit = coin.price_change_percentage_24h >= 0
@@ -75,8 +75,10 @@ let profit = coin.price_change_percentage_24h >= 0
      </span>
      <span style={{fontSize : 22, fontWeight : 500}}>
      {symbol} {numberWithCommas(coin.current_price.toFixed(2))}
-     </span>
 
+     </span>
+<span>   Market Cap Rank : {coin.market_cap_rank}
+</span>
     </Link>
     
   )
