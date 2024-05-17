@@ -2,8 +2,6 @@ import { AppBar, Container, MenuItem, ThemeProvider, Toolbar, Typography, create
 import React, { useContext } from 'react'
 import Select from '@material-ui/core/Select';
 import { Link } from 'react-router-dom';
-import { dark } from '@material-ui/core/styles/createPalette';
-import { faker } from '@faker-js/faker';
 import { crypto } from './cryptocontext';
 
 const useStyles = makeStyles(() => ({

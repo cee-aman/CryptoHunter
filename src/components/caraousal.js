@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom'
 import coinData from './coins.json'
 
 
-
 const useStyle  = makeStyles(() => ({
 cara : {
     height : "50%",
@@ -30,10 +29,9 @@ carouselItem : {
 
 function Carousel() {
 const classes = useStyle()
-const [treding, settreding] = useState([])
+const [treding, settreding] = useState(coinData)
 
 const {currency, symbol} = useContext(crypto)
-console.log(coinData, "das")
 
 
  function numberWithCommas(x) {
@@ -42,9 +40,11 @@ console.log(coinData, "das")
 
 const fetchTrendingCoins = async () => {
     const response = await axios.get(TrendingCoins(currency))
-    console.log(response)
-    settreding(response.data)
-}
+    if(response.status === 200) {
+      settreding(response.data)
+
+    }
+ }
 
 console.log(treding)
 

@@ -5,6 +5,7 @@ import axios from "axios";
 import { HistoricalChart } from "../config/api";
 import { crypto } from './cryptocontext';
 import SelectButton from "./buttoncomponent";
+import chartData from './chartData.json'
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -21,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Chart = ({ coin }) => {
-  const [historicData, setHistoricData] = useState([]);
+  const [historicData, setHistoricData] = useState(chartData);
   const [days, setDays] = useState(1);
   const { currency } = useContext(crypto);
   const classes = useStyles();
@@ -29,8 +30,12 @@ const Chart = ({ coin }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data } = await axios.get(HistoricalChart(coin.id, days, currency));
-        setHistoricData(data.prices);
+        const response = await axios.get(HistoricalChart(coin.id, days, currency));
+        if(response.status === 200) {
+          setHistoricData(response.data.prices);
+
+        }
+        
       } catch (error) {
         console.error('Failed to fetch historical data:', error);
       }
@@ -38,6 +43,7 @@ const Chart = ({ coin }) => {
 
     fetchData();
   }, [days, currency, coin.id]);
+  console.log(historicData)
 
   const chartDays = [
     {

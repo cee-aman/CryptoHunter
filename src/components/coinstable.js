@@ -1,15 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { CoinList } from "../config/api";
 import axios from "axios";
 import { useContext } from "react";
 import { crypto } from "./cryptocontext";
-import SearchIcon from "@mui/icons-material/Search";
 import {
-  AppBar,
-  Box,
   Container,
-  IconButton,
-  InputBase,
   LinearProgress,
   Table,
   TableBody,
@@ -18,17 +14,13 @@ import {
   TableHead,
   TableRow,
   ThemeProvider,
-  Toolbar,
   Typography,
-  alpha,
   createTheme,
   makeStyles,
-  styled,
 } from "@material-ui/core";
-import tableData from "./tableData.json";
 import { Link } from "react-router-dom";
-import { Pagination, Tab, TextField } from "@mui/material";
-
+import { Pagination, TextField } from "@mui/material";
+import tableData from './tableData.json'
 
 
 const useStyles = makeStyles(() => ({
@@ -48,18 +40,23 @@ pageina : {
 }))
 
 function CoinsTable() {
-  const [CoinData, setCoinData] = useState([]);
+  const [CoinData, setCoinData] = useState(tableData);
   const [loading, setloading] = useState(false);
   const [search, setsearch] = useState('')
   const [page, setpage] = useState(1)
   const { currency, symbol } = useContext(crypto);
 
   const classes = useStyles()
+  
   const fetchCoins = async () => {
     setloading(true);
     const response = await axios.get(CoinList(currency));
-    setCoinData(response.data);
-    setloading(false);
+    if(response.status === 200) {
+      setCoinData(response.data);
+      setloading(false);
+
+
+    }
   };
 
   useEffect(() => {

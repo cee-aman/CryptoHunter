@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { crypto } from '../components/cryptocontext'
@@ -6,8 +7,8 @@ import { SingleCoin } from '../config/api'
 import Chart from './../components/chart';
 import { LinearProgress, Typography, makeStyles } from '@material-ui/core'
 import ReactHtmlParser from 'react-html-parser'
+import singleCoindata from '../../src/components/singleCoin.json'
 
- 
 const useStyle = makeStyles((theme) => ({
 main : {
   display : 'flex',
@@ -64,9 +65,9 @@ function CoinPage() {
   const classes = useStyle()
 
   const {id} =  useParams()
-  const [coin, setcoin] = useState()
-  const {currency, symbol} = useContext(crypto)
-
+  const [coin, setcoin] = useState(singleCoindata)
+  const {currency} = useContext(crypto)
+console.log(coin, "dasdas")
 
   function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -74,7 +75,10 @@ function CoinPage() {
 
   const fetchSingleCoin =  async() => {
 const response = await axios.get(SingleCoin(id))
-setcoin(response.data)
+if (response.status === 200) {
+  setcoin(response.data)
+
+}
   }
  useEffect(() => {
   fetchSingleCoin()
