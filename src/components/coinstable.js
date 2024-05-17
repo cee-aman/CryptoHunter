@@ -54,8 +54,6 @@ function CoinsTable() {
     if(response.status === 200) {
       setCoinData(response.data);
       setloading(false);
-
-
     }
   };
 

@@ -52,7 +52,7 @@ console.log(currency)
  
 <Select style={{height: 40, width : 100, marginLeft: "66rem"}}  value={currency} onChange={(e) => setcurrency(e.target.value) } variant='outlined' >
 <MenuItem value={"USD"} >USD</MenuItem>
-<MenuItem value={"ISD"}>INR</MenuItem>
+<MenuItem value={"INR"}>INR</MenuItem>
 
 </Select>
     </Toolbar>
