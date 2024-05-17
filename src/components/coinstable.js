@@ -49,15 +49,23 @@ function CoinsTable() {
   const classes = useStyles()
   
   const fetchCoins = async () => {
-    setloading(true);
-    const response = await axios.get(CoinList(currency));
-    if(response.status === 200) {
-      setCoinData(response.data);
-      setloading(false);
-      
+    setloading(true); // Indicate loading state
+    try {
+      const response = await axios.get(CoinList(currency)); // Attempt to fetch data
+      if (response.status === 200) {
+        setCoinData(response.data); // Set the fetched data
+        setloading(false); // Indicate that loading has finished
+      } else {
+        console.error(`Unexpected status code: ${response.status}`); // Log unexpected status codes
+        // Handle cases where the status code is not 200
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching coins:", error); // Log the error
+      // Handle the error appropriately, e.g., by setting an error state or showing a message to the user
+      setloading(false); // Ensure loading state is cleared even in case of an error
     }
   };
-
+  
   useEffect(() => {
     fetchCoins();
   }, [currency]);

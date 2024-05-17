@@ -37,14 +37,21 @@ const {currency, symbol} = useContext(crypto)
  function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-
 const fetchTrendingCoins = async () => {
-    const response = await axios.get(TrendingCoins(currency))
-    if(response.status === 200) {
-      settreding(response.data)
-
+  try {
+    const response = await axios.get(TrendingCoins(currency));
+    if (response.status === 200) {
+      settreding(response.data);
+    } else {
+      console.error(`Unexpected status code: ${response.status}`);
+      // Handle the case where the status code is not 200
     }
- }
+  } catch (error) {
+    console.error("An error occurred while fetching trending coins:", error);
+    // Handle the error appropriately, e.g., by setting an error state or showing a message to the user
+  }
+};
+
 
 console.log(treding)
 

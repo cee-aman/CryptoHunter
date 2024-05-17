@@ -73,13 +73,18 @@ console.log(coin, "dasdas")
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
-  const fetchSingleCoin =  async() => {
-const response = await axios.get(SingleCoin(id))
-if (response.status === 200) {
-  setcoin(response.data)
+  const fetchSingleCoin = async () => {
+    try {
+      const response = await axios.get(SingleCoin(id));
+      if (response.status === 200) {
+        setcoin(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch coin data:", error);
+      // Optionally, set a default value or handle the error differently
+    }
+  };
 
-}
-  }
  useEffect(() => {
   fetchSingleCoin()
  }, [id])
