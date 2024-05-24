@@ -6,6 +6,8 @@ import { HistoricalChart } from "../config/api";
 import { crypto } from './cryptocontext';
 import SelectButton from "./buttoncomponent";
 import chartData from './chartData.json'
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -26,6 +28,10 @@ const Chart = ({ coin }) => {
   const [days, setDays] = useState(1);
   const { currency } = useContext(crypto);
   const classes = useStyles();
+  
+const showErrorToast = () => {
+  toast.error("API limit reached. Displaying hardcoded data." )
+};
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,6 +44,7 @@ const Chart = ({ coin }) => {
         
       } catch (error) {
         console.error('Failed to fetch historical data:', error);
+        showErrorToast()
       }
     };
 

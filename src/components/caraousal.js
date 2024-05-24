@@ -6,7 +6,8 @@ import { crypto } from './cryptocontext'
 import AliceCarousel from 'react-alice-carousel';
 import { Link } from 'react-router-dom'
 import coinData from './coins.json'
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const useStyle  = makeStyles(() => ({
 cara : {
@@ -33,6 +34,9 @@ const [treding, settreding] = useState(coinData)
 
 const {currency, symbol} = useContext(crypto)
 
+const showErrorToast = () => {
+    toast.error("API limit reached. Displaying hardcoded data." )
+};
 
  function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -44,10 +48,13 @@ const fetchTrendingCoins = async () => {
       settreding(response.data);
     } else {
       console.error(`Unexpected status code: ${response.status}`);
+      showErrorToast()
+      
       // Handle the case where the status code is not 200
     }
   } catch (error) {
-    console.error("An error occurred while fetching trending coins:", error);
+    console.error("d", error);
+    showErrorToast()
     // Handle the error appropriately, e.g., by setting an error state or showing a message to the user
   }
 };

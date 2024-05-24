@@ -5,9 +5,11 @@ import { crypto } from '../components/cryptocontext'
 import axios from 'axios'
 import { SingleCoin } from '../config/api'
 import Chart from './../components/chart';
-import { LinearProgress, Typography, makeStyles } from '@material-ui/core'
+import { Button, LinearProgress, Typography, makeStyles } from '@material-ui/core'
 import ReactHtmlParser from 'react-html-parser'
 import singleCoindata from '../../src/components/singleCoin.json'
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const useStyle = makeStyles((theme) => ({
 main : {
@@ -64,37 +66,50 @@ function CoinPage() {
 
   const classes = useStyle()
 
-  const {id} =  useParams()
-  const [coin, setcoin] = useState(singleCoindata)
-  const {currency} = useContext(crypto)
-console.log(coin, "dasdas")
 
+  const {id} =  useParams()
+  const {currency, coin, setcoin} = useContext(crypto)
+console.log(coin, "dasdas")
+const [dataBool, setdataBool] = useState(false)
   function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
+  const showHardCodedData = () => {
+    setcoin(singleCoindata)
+    setdataBool(true)
+  }
+
+  console.log(coin)
   const fetchSingleCoin = async () => {
     try {
       const response = await axios.get(SingleCoin(id));
       if (response.status === 200) {
         setcoin(response.data);
-      }
-    } catch (error) {
+         
+        setdataBool(true)
+
+      } 
+    }
+    
+     catch (error) {
       console.error("Failed to fetch coin data:", error);
+      setdataBool(false)
+
       // Optionally, set a default value or handle the error differently
     }
   };
 
+ 
  useEffect(() => {
   fetchSingleCoin()
  }, [id])
  console.log(coin)
 
- if(!coin) return <LinearProgress style={{backgroundColor : "gold"}} />
 
   
   return (
-    <div className={classes.main}>
+    dataBool ? <div className={classes.main}>
     <div className={classes.sidebar}>
     <img src={coin?.image?.large} alt={coin?.name} height= '200' />
     <Typography variant='h3' className={classes.heading}>{coin?.name} </Typography>
@@ -110,7 +125,7 @@ console.log(coin, "dasdas")
     <span style={{display : 'flex'}}>
     <Typography variant='h5'  className={classes.heading} >Current Price : </Typography>    
     &nbsp; &nbsp;
-    <Typography variant='h5'  style={{fontFamily :"Montserrat"}} >   {numberWithCommas(coin?.market_data.current_price[currency?.toLowerCase()])} </Typography>    
+    <Typography variant='h5'  style={{fontFamily :"Montserrat"}} > {numberWithCommas(coin?.market_data.current_price[currency?.toLowerCase()])} </Typography>    
     
         </span>
         <span style={{display : 'flex'}}>
@@ -127,7 +142,21 @@ console.log(coin, "dasdas")
     
     </div>
     
+    </div> : <>
+
+    <LinearProgress style={{backgroundColor : "gold"}} /> 
+    <div style={{display : 'flex', flexDirection : "column", justifyContent : 'center'}}>
+    
+    <Typography variant="h5" style={{ textAlign: 'center', marginTop: '10px', fontFamily: "montserrat" }}>
+    APIs are paid, but this is just a demo. I can show you hardcoded data. This feature is free for the first render or after waiting for a minute. Alternatively, you can click the button below to see the hardcoded data. My goal here is to showcase my skills.
+</Typography>    
+    <div style={{marginTop : 50, display : "flex", alignItems : "center", justifyContent : 'center'}}>
+    <Button onClick={showHardCodedData} color='primary'>Show HardCoded Data</Button>
     </div>
+    
+    </div>
+    
+    </>
   )
 }
 

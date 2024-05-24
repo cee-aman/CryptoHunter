@@ -4,6 +4,8 @@ import { CoinList } from "../config/api";
 import axios from "axios";
 import { useContext } from "react";
 import { crypto } from "./cryptocontext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   Container,
   LinearProgress,
@@ -17,6 +19,7 @@ import {
   Typography,
   createTheme,
   makeStyles,
+  styled,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { Pagination, TextField } from "@mui/material";
@@ -39,6 +42,19 @@ pageina : {
 }
 }))
 
+const StyledPagination = styled(Pagination)(({ theme }) => ({
+  '.MuiPaginationItem-root': {
+    color: 'gold',
+  },
+  '.MuiPaginationItem-root	': {
+    backgroundColor: 'gold',
+  },
+  '.MuiPaginationItem-root	': {
+    backgroundColor: 'gold',
+  },
+}));
+
+
 function CoinsTable() {
   const [CoinData, setCoinData] = useState(tableData);
   const [loading, setloading] = useState(false);
@@ -47,6 +63,10 @@ function CoinsTable() {
   const { currency, symbol } = useContext(crypto);
 
   const classes = useStyles()
+
+  const showErrorToast = () => {
+    toast.error("API limit reached. Displaying hardcoded data." )
+  };
   
   const fetchCoins = async () => {
     setloading(true); // Indicate loading state
@@ -56,11 +76,13 @@ function CoinsTable() {
         setCoinData(response.data); // Set the fetched data
         setloading(false); // Indicate that loading has finished
       } else {
-        console.error(`Unexpected status code: ${response.status}`); // Log unexpected status codes
-        // Handle cases where the status code is not 200
+        console.error(`Unexpected status code: ${response.status}`);
+        showErrorToast()        // Handle cases where the status code is not 200
       }
     } catch (error) {
-      console.error("An error occurred while fetching coins:", error); // Log the error
+      console.error("An error occurred while fetching coins:", error);
+      showErrorToast()        // Handle cases where the status code is not 200
+      // Log the error
       // Handle the error appropriately, e.g., by setting an error state or showing a message to the user
       setloading(false); // Ensure loading state is cleared even in case of an error
     }
@@ -71,15 +93,13 @@ function CoinsTable() {
   }, [currency]);
 
 
+
   // const fetchCoins = async () => {
   //   setloading(true);
   //   setCoinData(tableData);
   //   setloading(false);
   // };
 
-  // useEffect(() => {
-  //   fetchCoins();
-  // }, []);
 
   const handleSearchBar = () => {
     // Correctly convert names and symbols to lowercase
@@ -91,6 +111,9 @@ function CoinsTable() {
   function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
+
+    // Example usage of toast
+ 
 
 useEffect(() => {
   console.log(handleSearchBar());
@@ -105,6 +128,7 @@ useEffect(() => {
       },
       type: "dark",
     },
+    
   });
   const headers = ["Coin", "Price", "24h Change", "Market Cap"];
 
@@ -118,7 +142,7 @@ useEffect(() => {
         >
           Crypto Prices by Market Cap
         </Typography>
-        <TextField style={{marginTop: 15}} fullWidth label="Search" id="fullWidth" onChange={(e) => setsearch(e.target.value) } />
+        <TextField style={{marginTop: 15, backgroundColor : "#ffff"}} fullWidth label="Search" id="fullWidth" onChange={(e) => setsearch(e.target.value) } />
         <TableContainer>
         
         {
@@ -163,14 +187,14 @@ useEffect(() => {
             ) 
         }
         </TableContainer>
-              <Pagination  style={{padding: 20, display : 'flex', justifyContent : 'center', width : '100%'}} count={(handleSearchBar()?.length/10).toFixed(0)} variant="outlined" color="secondary"
+              <StyledPagination style={{padding: 20, display : 'flex', justifyContent : 'center', width : '100%'}} count={(handleSearchBar()?.length/10).toFixed(0)} color="primary" 
               onChange={(_, value) => { setpage(value)
                 window.scroll(0, 450)
 
               }}
                />
 
-       
+
       </Container>
     </ThemeProvider>
   );
