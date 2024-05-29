@@ -66,7 +66,7 @@ function CoinPage() {
 
   const classes = useStyle()
 
-
+  const [isLoading, setIsLoading] = useState(false); // New state variable for tracking loading state
   const {id} =  useParams()
   const {currency, coin, setcoin} = useContext(crypto)
 console.log(coin, "dasdas")
@@ -81,25 +81,23 @@ const [dataBool, setdataBool] = useState(false)
   }
 
   console.log(coin)
+
   const fetchSingleCoin = async () => {
+    setIsLoading(true); // Set isLoading to true at the start of the request
     try {
       const response = await axios.get(SingleCoin(id));
       if (response.status === 200) {
         setcoin(response.data);
-         
-        setdataBool(true)
-
-      } 
-    }
-    
-     catch (error) {
+        setdataBool(true);
+      }
+    } catch (error) {
       console.error("Failed to fetch coin data:", error);
-      setdataBool(false)
-
+      setdataBool(false);
       // Optionally, set a default value or handle the error differently
+    } finally {
+      setIsLoading(false); // Set isLoading to false regardless of the request outcome
     }
   };
-
  
  useEffect(() => {
   fetchSingleCoin()
@@ -107,9 +105,19 @@ const [dataBool, setdataBool] = useState(false)
  console.log(coin)
 
 
-  
-  return (
-    dataBool ? <div className={classes.main}>
+ return (
+  isLoading? <LinearProgress style={{ backgroundColor: "gold" }} /> :
+ !dataBool? (
+    <>
+      <Typography variant="h5" style={{ textAlign: 'center', marginTop: '10px', fontFamily: "montserrat" }}>
+        APIs are paid, but this is just a demo. I can show you hardcoded data. This feature is free for the first render or after waiting for a minute. Alternatively, you can click the button below to see the hardcoded data. My goal here is to showcase my skills.
+      </Typography>
+      <div style={{ marginTop: 50, display: "flex", alignItems: "center", justifyContent: 'center' }}>
+        <Button onClick={showHardCodedData} color='primary'>Show HardCoded Data</Button>
+      </div>
+    </>
+  ) : (
+    <div className={classes.main}>
     <div className={classes.sidebar}>
     <img src={coin?.image?.large} alt={coin?.name} height= '200' />
     <Typography variant='h3' className={classes.heading}>{coin?.name} </Typography>
@@ -142,22 +150,10 @@ const [dataBool, setdataBool] = useState(false)
     
     </div>
     
-    </div> : <>
-
-    <LinearProgress style={{backgroundColor : "gold"}} /> 
-    <div style={{display : 'flex', flexDirection : "column", justifyContent : 'center'}}>
-    
-    <Typography variant="h5" style={{ textAlign: 'center', marginTop: '10px', fontFamily: "montserrat" }}>
-    APIs are paid, but this is just a demo. I can show you hardcoded data. This feature is free for the first render or after waiting for a minute. Alternatively, you can click the button below to see the hardcoded data. My goal here is to showcase my skills.
-</Typography>    
-    <div style={{marginTop : 50, display : "flex", alignItems : "center", justifyContent : 'center'}}>
-    <Button onClick={showHardCodedData} color='primary'>Show HardCoded Data</Button>
     </div>
     
-    </div>
-    
-    </>
   )
+);
 }
 
-export default CoinPage
+export default CoinPage;
